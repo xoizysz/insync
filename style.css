@@ -1,0 +1,241 @@
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #0a192f 0%, #112240 100%);
+  color: white;
+  text-align: center;
+  min-height: 100vh;
+}
+
+.container {
+  padding: 50px 20px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+h1 {
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+  background: linear-gradient(45deg, #64ffda, #52e0c4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+h2 {
+  font-size: 1.8rem;
+  margin: 30px 0 20px 0;
+  color: #64ffda;
+}
+
+p {
+  margin-bottom: 30px;
+  font-size: 1.1rem;
+  opacity: 0.9;
+}
+
+.button-group {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+button {
+  background: #64ffda;
+  color: #0a192f;
+  border: none;
+  padding: 15px 25px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 150px;
+  box-shadow: 0 4px 15px rgba(100, 255, 218, 0.3);
+}
+
+button:hover {
+  background: #52e0c4;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(100, 255, 218, 0.4);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+.back {
+  margin-top: 30px;
+  background: #ff6b6b;
+  color: white;
+  box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+}
+
+.back:hover {
+  background: #ff5252;
+  box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+}
+
+/* Feature Sections */
+.feature-section {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-radius: 15px;
+  padding: 30px;
+  margin: 30px 0;
+  border: 1px solid rgba(100, 255, 218, 0.2);
+}
+
+/* Status Messages */
+.status {
+  margin: 15px 0;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 1rem;
+  min-height: 20px;
+  transition: all 0.3s ease;
+}
+
+/* Output Boxes */
+.output-box {
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px dashed rgba(100, 255, 218, 0.5);
+  border-radius: 12px;
+  padding: 20px;
+  margin: 20px 0;
+  min-height: 100px;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  text-align: left;
+  white-space: pre-wrap;
+  backdrop-filter: blur(5px);
+  transition: all 0.3s ease;
+}
+
+.output-box:not(:empty) {
+  border-color: #64ffda;
+  background: rgba(100, 255, 218, 0.1);
+}
+
+/* Camera Container */
+.camera-container {
+  margin: 20px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 10px;
+}
+
+#video {
+  border-radius: 12px;
+  border: 3px solid #64ffda;
+  box-shadow: 0 8px 25px rgba(100, 255, 218, 0.3);
+}
+
+#canvas {
+  border-radius: 8px;
+  border: 2px solid #52e0c4;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .container {
+    padding: 30px 15px;
+  }
+  
+  h1 {
+    font-size: 2rem;
+  }
+  
+  h2 {
+    font-size: 1.5rem;
+  }
+  
+  .button-group {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  button {
+    width: 100%;
+    max-width: 300px;
+  }
+  
+  .feature-section {
+    padding: 20px;
+    margin: 20px 0;
+  }
+  
+  #video {
+    width: 100%;
+    max-width: 350px;
+    height: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 20px 10px;
+  }
+  
+  h1 {
+    font-size: 1.8rem;
+  }
+  
+  .output-box {
+    font-size: 1rem;
+    padding: 15px;
+  }
+  
+  button {
+    padding: 12px 20px;
+    font-size: 1rem;
+  }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.feature-section {
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* Loading States */
+.loading {
+  position: relative;
+  overflow: hidden;
+}
+
+.loading::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(100, 255, 218, 0.3),
+    transparent
+  );
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}

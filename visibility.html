@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Visibility Options</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Accessibility for Visibility</h1>
+    <p>Choose your preference:</p>
+    <div class="button-group">
+      <button onclick="readText()">🔊 Text to Speech</button>
+      <button onclick="alert('Object Reader feature coming soon 🚀')">📷 Object Reader</button>
+    </div>
+    <br>
+    <button class="back" onclick="location.href='index.html'">⬅️ Back</button>
+  </div>
+
+  <script>
+    function readText() {
+      let text = prompt("Enter text to read aloud:");
+      if (text) {
+        let speech = new SpeechSynthesisUtterance(text);
+        speech.lang = "en-US"; // can be changed to other languages
+        window.speechSynthesis.speak(speech);
+      }
+    }
+  </script>
+</body>
+</html>

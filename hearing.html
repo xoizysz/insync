@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hearing Options</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Accessibility for Hearing</h1>
+    <p>Choose your preference:</p>
+    
+    <div class="button-group">
+      <button onclick="showSpeechToText()">🎤 Speech to Text</button>
+      <button onclick="showSignToText()">👋 Sign Language to Text</button>
+    </div>
+
+    <!-- Speech to Text Section -->
+    <div id="speechSection" class="feature-section" style="display:none;">
+      <h2>🎤 Real-Time Speech to Text</h2>
+      <div class="button-group">
+        <button id="recordBtn" onclick="toggleSpeechRecognition()">🎙️ Start Listening</button>
+        <button onclick="clearSpeechOutput()">🗑️ Clear</button>
+      </div>
+      <div id="recordingStatus" class="status"></div>
+      
+      <div style="margin: 20px 0;">
+        <h3>Current Speech (Live):</h3>
+        <div id="currentSpeech" class="output-box" style="background: rgba(255, 193, 7, 0.1); border-color: #ffc107;">
+          Listening for current speech...
+        </div>
+        
+        <h3>Full Conversation:</h3>
+        <div id="fullConversation" class="output-box" style="background: rgba(40, 167, 69, 0.1); border-color: #28a745;">
+          Complete conversation will appear here...
+        </div>
+      </div>
+    </div>
+
+    <!-- Sign Language Section -->
+    <div id="signSection" class="feature-section" style="display:none;">
+      <h2>👋 Sign Language to Text</h2>
+      <div class="button-group">
+        <button id="cameraBtn" onclick="toggleCamera()">📹 Start Camera</button>
+        <button onclick="captureFrame()">📸 Analyze Frame</button>
+        <button onclick="clearSignOutput()">🗑️ Clear</button>
+      </div>
+      <div class="camera-container">
+        <video id="video" width="400" height="300" autoplay muted style="display:none;"></video>
+        <canvas id="canvas" width="400" height="300" style="display:none;"></canvas>
+      </div>
+      <div id="signStatus" class="status"></div>
+      <div id="signOutput" class="output-box">Enable camera to start sign language detection...</div>
+    </div>
+
+    <br>
+    <button class="back" onclick="goBack()">⬅️ Back</button>
+  </div>
+
+  <script>
+    let recognition;
+    let isRecording = false;
+    let videoStream;
+    let isCameraOn = false;
+
+    // Show/Hide sections
+    function showSpeechToText() {
+      document.getElementById('speechSection').style.display = 'block';
+      document.getElementById('signSection').style.display = 'none';
+    }
+
+    function showSignToText() {
+      document.getElementById('speechSection').style.display = 'none';
+      document.getElementById('signSection').style.display = 'block';
+    }
+
+    function goBack() {
+      if (isRecording) toggleSpeechRecognition();
+      if (isCameraOn) stopCamera();
+      location.href = 'index.html';
+    }
+
+    // --------------------
+    // Web Speech API
+    // --------------------
+    function toggleSpeechRecognition() {
+      const outputBox = document.getElementById('currentSpeech');
+      const fullBox = document.getElementById('fullConversation');
+      const statusBox = document.getElementById('recordingStatus');
+      const recordBtn = document.getElementById('recordBtn');
+
+      if (!isRecording) {
+        if (!('webkitSpeechRecognition' in window)) {
+          alert('Speech Recognition not supported in this browser. Use Chrome or Edge.');
+          return;
+        }
+
+        recognition = new webkitSpeechRecognition();
+        recognition.lang = 'en-US';
+        recognition.interimResults = true;
+        recognition.continuous = true;
+
+        recognition.onresult = (event) => {
+          let interimTranscript = '';
+          let finalTranscript = fullBox.textContent;
+
+          for (let i = event.resultIndex; i < event.results.length; ++i) {
+            let transcript = event.results[i][0].transcript;
+            if (event.results[i].isFinal) {
+              finalTranscript += transcript + ' ';
+            } else {
+              interimTranscript += transcript;
+            }
+          }
+
+          outputBox.textContent = interimTranscript || 'Listening...';
+          fullBox.textContent = finalTranscript;
+        };
+
+        recognition.onerror = (event) => {
+          console.error('Speech recognition error', event);
+        };
+
+        recognition.onend = () => {
+          if (isRecording) {
+            recognition.start(); // restart if accidentally stopped
+          }
+        };
+
+        recognition.start();
+        isRecording = true;
+        recordBtn.textContent = '⏹️ Stop Listening';
+        recordBtn.style.background = '#ff6b6b';
+        statusBox.textContent = '🎙️ Listening...';
+        statusBox.style.background = '#d1ecf1';
+      } else {
+        recognition.stop();
+        isRecording = false;
+        recordBtn.textContent = '🎙️ Start Listening';
+        recordBtn.style.background = '#64ffda';
+        statusBox.textContent = '🛑 Stopped';
+        statusBox.style.background = '#fff3cd';
+      }
+    }
+
+    function clearSpeechOutput() {
+      document.getElementById('currentSpeech').textContent = 'Listening for current speech...';
+      document.getElementById('fullConversation').textContent = 'Complete conversation will appear here...';
+      document.getElementById('recordingStatus').textContent = '';
+    }
+
+    // --------------------
+    // Sign Language Functions (unchanged)
+    // --------------------
+    async function toggleCamera() {
+      if (isCameraOn) stopCamera();
+      else startCamera();
+    }
+
+    async function startCamera() {
+      try {
+        videoStream = await navigator.mediaDevices.getUserMedia({ video: { width: 400, height: 300 } });
+        const video = document.getElementById('video');
+        video.srcObject = videoStream;
+        video.style.display = 'block';
+        isCameraOn = true;
+        document.getElementById('cameraBtn').textContent = '📹 Stop Camera';
+        document.getElementById('cameraBtn').style.background = '#ff6b6b';
+        document.getElementById('signStatus').textContent = '📹 Camera active - Show your signs!';
+        document.getElementById('signStatus').style.background = '#d1ecf1';
+      } catch (err) {
+        alert('Camera access denied: ' + err.message);
+      }
+    }
+
+    function stopCamera() {
+      if (videoStream) {
+        videoStream.getTracks().forEach(track => track.stop());
+        videoStream = null;
+        const video = document.getElementById('video');
+        video.style.display = 'none';
+        video.srcObject = null;
+        isCameraOn = false;
+        document.getElementById('cameraBtn').textContent = '📹 Start Camera';
+        document.getElementById('cameraBtn').style.background = '#64ffda';
+        document.getElementById('signStatus').textContent = '';
+      }
+    }
+
+    async function captureFrame() {
+      if (!isCameraOn) return alert('Please start the camera first!');
+      const video = document.getElementById('video');
+      const canvas = document.getElementById('canvas');
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, 400, 300);
+      const imageData = canvas.toDataURL('image/jpeg');
+      document.getElementById('signStatus').textContent = '🔄 Analyzing gesture...';
+      document.getElementById('signStatus').style.background = '#fff3cd';
+
+      try {
+        const response = await fetch('http://127.0.0.1:5000/sign-to-text', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ image_data: imageData })
+        });
+
+        const result = await response.json();
+        if (result.success) {
+          document.getElementById('signOutput').innerHTML = `<strong>Detected:</strong> ${result.text}<br><br>` +
+            `<small>Hands detected: ${result.hands_count}</small>`;
+          document.getElementById('signStatus').textContent = '✅ Analysis complete!';
+          document.getElementById('signStatus').style.background = '#d4edda';
+        } else throw new Error(result.error || 'Unknown error');
+      } catch (err) {
+        console.error('Sign language error:', err);
+        document.getElementById('signOutput').textContent = 'Error: ' + err.message;
+        document.getElementById('signStatus').textContent = '❌ Error analyzing frame';
+        document.getElementById('signStatus').style.background = '#f8d7da';
+      }
+    }
+
+    function clearSignOutput() {
+      document.getElementById('signOutput').textContent = 'Enable camera to start sign language detection...';
+      document.getElementById('signStatus').textContent = '';
+    }
+
+    window.addEventListener('beforeunload', function() {
+      if (isRecording) toggleSpeechRecognition();
+      if (isCameraOn) stopCamera();
+    });
+
+  </script>
+</body>
+</html>
